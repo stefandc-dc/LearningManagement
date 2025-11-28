@@ -41,7 +41,10 @@ export default async function CourseEditorPage({ params }: { params: { courseId:
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold text-gray-900">Modules</h2>
                     {/* Add Module Form */}
-                    <form action={createModule} className="flex gap-2">
+                    <form action={async (formData) => {
+                        "use server";
+                        await createModule(formData);
+                    }} className="flex gap-2">
                         <input type="hidden" name="courseId" value={course.id} />
                         <input
                             type="text"
