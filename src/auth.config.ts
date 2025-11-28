@@ -1,19 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
-
-async function getUser(email: string) {
-    try {
-        const user = await prisma.user.findUnique({ where: { email } });
-        return user;
-    } catch (error) {
-        console.error("Failed to fetch user:", error);
-        throw new Error("Failed to fetch user.");
-    }
-}
 
 export const authConfig = {
     pages: {
@@ -49,30 +35,5 @@ export const authConfig = {
             return token;
         },
     },
-    providers: [
-        Credentials({
-            async authorize(credentials) {
-                const parsedCredentials = z
-                    .object({ email: z.string().email(), password: z.string().min(6) })
-                    .safeParse(credentials);
-
-                if (parsedCredentials.success) {
-                    const { email, password } = parsedCredentials.data;
-                    const user = await getUser(email);
-                    if (!user) return null;
-
-                    // For this demo, we might want to allow a default password or check hash
-                    // In a real app, use bcrypt.compare(password, user.password)
-                    // Note: The User model in schema.prisma doesn't have a password field yet!
-                    // We need to add it or use a different auth method.
-                    // Adding password field to schema now.
-
-                    // Placeholder for password check until schema is updated
-                    return user;
-                }
-                console.log("Invalid credentials");
-                return null;
-            },
-        }),
-    ],
+    providers: [], // Providers are configured in auth.ts
 } satisfies NextAuthConfig;
